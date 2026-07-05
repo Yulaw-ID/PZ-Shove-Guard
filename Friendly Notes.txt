@@ -1,0 +1,50 @@
+Shove Guard - Friendly Notes
+
+This exploit was patched in 42.16.0 under the changelog entry "Fixed Bluetooth-shoves while holding firearms", so it won't work in that or later versions of the game.
+
+It might not be possible to go back to 42.15 or below, since those versions had a major exploit/vulnerability that allowed Remote Code Execution (RCE), meaning a malicious mod could execute code on your PC. There was also a separate vulnerability that allowed cheaters/exploiters to interfere with server functionality. Because of these issues, older B42 versions were removed from Steam.
+
+So, sadly, it's unlikely that you will be able to test this mod. However, it can still give you an idea of how Project Zomboid's code works, especially its combat system.
+
+Because of that, I didn't include some of the supporting libraries, since they aren't needed to understand the code and would only make the project larger and more confusing than necessary.
+
+
+Target version:
+
+- Project Zomboid 42.15.X.
+
+
+Files:
+
+- Agent.java: is loaded first and injects the hooks into Project Zomboid's CombatManager.
+- Hooks.java: contains the actual exploit detection logic.
+
+
+How the fix works:
+
+1. Normal attacks are allowed.
+2. Suspicious attacks are checked more carefully.
+3. The suspicious signature is:
+   - The player is aiming.
+   - Their primary item is ranged.
+   - The collision weapon is Base.BareHands.
+4. If that suspicious path tries to hit from too far away, the hit is cancelled.
+5. If the game has no direct target yet, the code scans nearby squares for a valid close target.
+6. A short 400 ms timer blocks immediate follow-up hits after an invalid attempt.
+
+
+Debugging:
+
+- In Agent.java and Hooks.java, change DEBUG from false to true to print debug logs.
+- Keep DEBUG set to false for normal server use unless you're actively testing.
+
+
+Important:
+
+- This project intentionally relies heavily on reflection because it patches Project Zomboid's internals from a Java agent.
+- Most helper methods are named safeSomething because they fail quietly instead of crashing the server.
+
+
+Sad note:
+
+- This exploit got patched before I could fully finish testing the mod, so it was never publicly released.
